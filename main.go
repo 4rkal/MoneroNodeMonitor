@@ -27,7 +27,7 @@ type RPCResponse struct {
 		Synchronized bool `json:"synchronized"`
 		FreeSpace uint `json:"free_space"`
 		OutgoingConnectionsCount uint `json:"outgoing_connections_count"`
-		TxCount uint `json:"tx_count"`
+		TxPoolSize uint `json:"tx_pool_size"`
 	} `json:"result"`
 	JSONRPC string `json:"jsonrpc"`
 }
