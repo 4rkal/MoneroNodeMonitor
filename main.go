@@ -1,12 +1,16 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"html/template"
 	"net/http"
+	"bytes"
+	"embed"
 )
+
+//go:embed templates/index.gohtml
+var content embed.FS
 
 type RPCRequest struct {
 	JSONRPC string `json:"jsonrpc"`
@@ -44,8 +48,17 @@ func getInfoHandler(w http.ResponseWriter, r *http.Request) {
 	var rpcResponse RPCResponse
 	_ = json.NewDecoder(resp.Body).Decode(&rpcResponse)
 
-	tmpl, _ := template.ParseFiles("index.gohtml")
-	_ = tmpl.Execute(w, rpcResponse.Result)
+	tmpl, err := template.ParseFS(content, "templates/index.gohtml")
+	if err != nil {
+		http.Error(w, "Error parsing embedded HTML template: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	err = tmpl.Execute(w, rpcResponse.Result)
+	if err != nil {
+		http.Error(w, "Error executing template: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 func main() {
